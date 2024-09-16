@@ -1,6 +1,7 @@
+import { useEffect, useState, useCallback } from 'react';
+
 import { CommicGetter } from '../../modules/comic/application/get';
 import { ApiComicRepository } from '../../modules/comic/infrastructure/ApiComicRepository';
-import { useEffect, useState } from 'react';
 import { Comic } from '../../modules/comic/domain/Comic';
 
 const repository = new ApiComicRepository();
@@ -9,8 +10,9 @@ const service = new CommicGetter(repository);
 export function ComicList() {
     const [comics, setComics] = useState<Comic[]>();
     const [limit, setLimit] = useState(15);
-
-    const loadComics = () => {
+    
+    const loadComics = useCallback(
+      () => {
         console.log("loading comics")
         service
             .get(limit)
@@ -23,11 +25,13 @@ export function ComicList() {
             .catch((errors: any) => {
                 console.log('errors', errors);
             });
-    }
+      },
+      [limit],
+    )
 
     useEffect(() => {
         loadComics();
-    }, []);
+    }, [loadComics]);
 
     const onChange = (value: string) => {
         setLimit(+value);
